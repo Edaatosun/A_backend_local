@@ -417,6 +417,10 @@ const checkJobIsOwner = async (req, res, next) => {
       res.status(200).json({
         isOwner: isOwner,
       });
+      if (!job) {
+  return res.status(404).json({ message: "İlan bulunamadı" });
+}
+
     }
   } catch (error) {
     console.log("Error at check job is owner " + error);
