@@ -27,8 +27,8 @@ actionRouter.get("/search/event",verifyToken, actionController.searchEvent);
 actionRouter.post("/cancel/event",verifyToken, actionController.cancelEventApplication);
 
 
-actionRouter.post("/messages/send", verifyToken, messageController.sendMessage);
-actionRouter.post("/messages/join", verifyToken, messageController.joinRoom);
-actionRouter.get("/messages/:receiver_id", verifyToken, messageController.getMessages);
+actionRouter.post("/messages/send", verifyToken, actionController.sendMessage);
+actionRouter.post("/messages/join", verifyToken, actionController.joinRoom);
+actionRouter.get("/messages/:receiver_id", verifyToken, actionController.getMessages);
 
 module.exports = actionRouter;
