@@ -167,6 +167,10 @@ app.get("/messages/:receiver_id", async (req, res) => {
     }
 });
 
+app.get("/", (req, res) => {
+  res.send("socket API'si çalışıyor");
+});
+
 
 
 
