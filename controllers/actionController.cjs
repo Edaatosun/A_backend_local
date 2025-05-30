@@ -32,6 +32,7 @@ const allJobPosts = async (req, res, next) => {
 const checkMyJobApplication = async (req, res, next) => {
   const userId = req.user.id;
   const jobId = req.params.jobId;
+  console.log(jobId);
 
   try {
     const application = await JobApplication.findOne({
