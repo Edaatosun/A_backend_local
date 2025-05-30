@@ -9,6 +9,8 @@ const Event = require("../models/eventModel.cjs");
 const path = require('path');
 const { format } = require('util');
 const bucket = require('../firebase/firebaseService.cjs');
+const Room = require("../models/roomModel.cjs");
+const Message = require("../models/messageModel.cjs");
 
 const allJobPosts = async (req, res, next) => {
   try {
@@ -400,6 +402,96 @@ const getEventDetails = async (req, res) => {
   }
 };
 
+// Oda ismi oluşturucu
+function getRoomName(senderId, receiverId) {
+  return senderId < receiverId
+    ? `${senderId}-${receiverId}`
+    : `${receiverId}-${senderId}`;
+}
+
+
+const sendMessage = async (req, res) => {
+  const tokenUserId = req.user.id;
+  const { receiver_id, message } = req.body;
+
+  try {
+    const roomName = getRoomName(tokenUserId, receiver_id);
+
+    let room = await Room.findOne({ roomName });
+    if (!room) {
+      return res.status(404).json({ error: "Oda bulunamadı" });
+    }
+
+    const newMessage = await Message.create({
+      room: room._id,
+      sender_id: tokenUserId,
+      receiver_id,
+      message,
+    });
+
+    return res.status(200).json({
+      msg: "Mesaj gönderildi",
+      message: newMessage,
+    });
+  } catch (error) {
+    console.error("Mesaj gönderim hatası:", error);
+    res.status(500).json({ error: "Mesaj gönderilemedi" });
+  }
+};
+
+
+const joinRoom = async (req, res) => {
+  const sender_id = req.user.id;
+  const { receiver_id } = req.body;
+
+  try {
+    const roomName = getRoomName(sender_id, receiver_id);
+
+    let room = await Room.findOne({ roomName });
+
+    if (!room) {
+      room = await Room.create({
+        roomName,
+        participants: [sender_id, receiver_id],
+      });
+      console.log(`🆕 Yeni oda oluşturuldu: ${roomName}`);
+    }
+
+    return res.status(200).json({
+      msg: "Odaya katılım sağlandı",
+      room,
+    });
+  } catch (error) {
+    console.error("Odaya katılma hatası:", error);
+    res.status(500).json({ error: "Katılım başarısız" });
+  }
+};
+
+
+const getMessages = async (req, res) => {
+  const sender_id = req.user.id;
+  const receiver_id = req.params.receiver_id;
+
+  try {
+    const roomName = getRoomName(sender_id, receiver_id);
+
+    const room = await Room.findOne({ roomName });
+    if (!room) {
+      return res.status(404).json({ error: "Oda bulunamadı" });
+    }
+
+    const messages = await Message.find({ room: room._id }).sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      room: roomName,
+      messages,
+    });
+  } catch (error) {
+    console.error("Mesajları getirirken hata:", error);
+    res.status(500).json({ error: "Mesajlar alınamadı" });
+  }
+};
+
 
 module.exports = {
   checkMyJobApplication,
@@ -417,5 +509,9 @@ module.exports = {
   cancelEventApplication,
   getJobDetails,
   getInternDetails,
-  getEventDetails
+  getEventDetails,
+  sendMessage,
+  getMessages,
+  joinRoom,
+
 };
