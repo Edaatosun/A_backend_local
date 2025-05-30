@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"node app.cjs\" \"node socket/socketServer.cjs\""
+    "start": "node start.cjs"
   },
   "author": "",
   "license": "ISC",
