@@ -440,7 +440,6 @@ const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // Anlık mesajı karşı tarafın socketine gönder
     const receiverSocket = socketConnections[receiver_id];
     if (receiverSocket) {
       receiverSocket.to(roomName).emit("receiveMessage", {
@@ -455,13 +454,12 @@ const sendMessage = async (req, res) => {
     }
 
     res.status(200).json({ message: "Mesaj gönderildi" });
-
-
   } catch (error) {
-    console.error("Mesaj gönderilirken hata:", error);
+    console.error("Mesaj gönderilirken hata:", error); // Burası çok önemli
     res.status(500).json({ error: "Gönderim hatası" });
   }
 };
+
 
 
 const joinRoom = async (req, res) => {
