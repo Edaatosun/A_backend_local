@@ -11,6 +11,7 @@ const { format } = require('util');
 const bucket = require('../firebase/firebaseService.cjs');
 const Room = require("../models/roomModel.cjs");
 const Message = require("../models/messageModel.cjs");
+const { io, socketConnections } = require("../app.cjs");
 
 const allJobPosts = async (req, res, next) => {
   try {
@@ -414,33 +415,63 @@ function getRoomName(senderId, receiverId) {
     : `${receiverId}-${senderId}`;
 }
 
-
 const sendMessage = async (req, res) => {
-  const tokenUserId = req.user.id;
-  const { receiver_id, message } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Token gerekli" });
 
   try {
-    const roomName = getRoomName(tokenUserId, receiver_id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const sender_id = decoded.id;
+    const { receiver_id, message } = req.body;
+
+    const roomName = getRoomName(sender_id, receiver_id);
 
     let room = await Room.findOne({ roomName });
     if (!room) {
       return res.status(404).json({ error: "Oda bulunamadı" });
     }
 
-    const newMessage = await Message.create({
+    const newMessage = new Message({
       room: room._id,
-      sender_id: tokenUserId,
+      sender_id,
       receiver_id,
       message,
     });
 
-    return res.status(200).json({
-      msg: "Mesaj gönderildi",
-      message: newMessage,
-    });
+    await newMessage.save();
+
+    // Anlık mesajı karşı tarafın socketine gönder
+    const receiverSocket = socketConnections[receiver_id];
+    if (receiverSocket) {
+      receiverSocket.emit("receiveMessage", {
+        _id: newMessage._id,
+        room: room._id,
+        sender_id,
+        receiver_id,
+        message,
+        createdAt: newMessage.createdAt,
+        isRead: newMessage.isRead,
+      });
+    }
+
+    // Opsiyonel: gönderenin kendisine de anlık göstermek istersen
+    const senderSocket = socketConnections[sender_id];
+    if (senderSocket) {
+      senderSocket.emit("receiveMessage", {
+        _id: newMessage._id,
+        room: room._id,
+        sender_id,
+        receiver_id,
+        message,
+        createdAt: newMessage.createdAt,
+        isRead: newMessage.isRead,
+      });
+    }
+
+    res.status(200).json({ message: "Mesaj gönderildi" });
   } catch (error) {
-    console.error("Mesaj gönderim hatası:", error);
-    res.status(500).json({ error: "Mesaj gönderilemedi" });
+    console.error("Mesaj gönderilirken hata:", error);
+    res.status(500).json({ error: "Gönderim hatası" });
   }
 };
 
