@@ -46,8 +46,8 @@ const checkMyJobApplication = async (req, res, next) => {
         resume: application.resume,
       });
       if (!application) {
-  return res.status(404).json({ message: "Başvuru bulunamadı." });
-}
+        return res.status(404).json({ message: "Başvuru bulunamadı." });
+      }
 
     }
   } catch (error) {
@@ -443,21 +443,7 @@ const sendMessage = async (req, res) => {
     // Anlık mesajı karşı tarafın socketine gönder
     const receiverSocket = socketConnections[receiver_id];
     if (receiverSocket) {
-      receiverSocket.emit("receiveMessage", {
-        _id: newMessage._id,
-        room: room._id,
-        sender_id,
-        receiver_id,
-        message,
-        createdAt: newMessage.createdAt,
-        isRead: newMessage.isRead,
-      });
-    }
-
-    // Opsiyonel: gönderenin kendisine de anlık göstermek istersen
-    const senderSocket = socketConnections[sender_id];
-    if (senderSocket) {
-      senderSocket.emit("receiveMessage", {
+      receiverSocket.to(roomName).emit("receiveMessage", {
         _id: newMessage._id,
         room: room._id,
         sender_id,
@@ -469,6 +455,8 @@ const sendMessage = async (req, res) => {
     }
 
     res.status(200).json({ message: "Mesaj gönderildi" });
+
+
   } catch (error) {
     console.error("Mesaj gönderilirken hata:", error);
     res.status(500).json({ error: "Gönderim hatası" });
