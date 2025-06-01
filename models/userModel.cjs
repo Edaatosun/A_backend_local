@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const logoPath = "http://localhost:3000/uploads/avatars/arel_logo.png"
+const logoPath = "https://firebasestorage.googleapis.com/v0/b/arelnetworkstorage.firebasestorage.app/o/uploads%2Favatars%2Farel_logo.png?alt=media&token=83e0f42a-4a04-41bd-b189-dc48da6ed237"
 
 const { Schema } = mongoose;
 
