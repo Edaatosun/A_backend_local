@@ -623,7 +623,7 @@ const removePhoto = async(req, res, next) => {
   const userId = req.user.id;
   try {
     const _findedUser = await User.findByIdAndUpdate(userId, {
-      photo: "https://bitirme-projesi-17w9.onrender.com/uploads/avatars/arel_logo.png",
+      photo: "https://firebasestorage.googleapis.com/v0/b/arelnetworkstorage.firebasestorage.app/o/uploads%2Favatars%2Farel_logo.png?alt=media&token=83e0f42a-4a04-41bd-b189-dc48da6ed237",
     },{ new: true });
     if(_findedUser){
       res.status(200).json({
