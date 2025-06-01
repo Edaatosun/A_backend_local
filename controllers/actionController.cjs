@@ -40,14 +40,17 @@ const checkMyJobApplication = async (req, res, next) => {
       applicant: userId,
       job: jobId,
     });
+
+    
     if (application) {
       return res.status(200).json({
         message: "Başvuru yapılmış.",
         resume: application.resume,
       });
-      if (!application) {
-        return res.status(404).json({ message: "Başvuru bulunamadı." });
-      }
+    }else{
+      return res.status(200).json({
+        message: "Başvuru yapılmamış.",
+      });
 
     }
   } catch (error) {
