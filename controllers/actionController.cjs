@@ -11,7 +11,7 @@ const { format } = require('util');
 const bucket = require('../firebase/firebaseService.cjs');
 const Room = require("../models/roomModel.cjs");
 const Message = require("../models/messageModel.cjs");
-const { io, socketConnections } = require("../app.cjs");
+const {socketConnections } = require("../socket/socketManager.cjs");
 
 const allJobPosts = async (req, res, next) => {
   try {
@@ -440,10 +440,9 @@ const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // ❗ DÜZENLİ HALİ
     const receiverSocket = socketConnections[receiver_id];
     if (receiverSocket) {
-      receiverSocket.emit("receiveMessage", {
+      receiverSocket.to(roomName).emit("receiveMessage", {
         _id: newMessage._id,
         room: room._id,
         sender_id,
@@ -460,9 +459,6 @@ const sendMessage = async (req, res) => {
     res.status(500).json({ error: "Gönderim hatası" });
   }
 };
-
-
-
 
 const joinRoom = async (req, res) => {
   const sender_id = req.user.id;
@@ -491,7 +487,6 @@ const joinRoom = async (req, res) => {
   }
 };
 
-
 const getMessages = async (req, res) => {
   const sender_id = req.user.id;
   const receiver_id = req.params.receiver_id;
@@ -515,7 +510,6 @@ const getMessages = async (req, res) => {
     res.status(500).json({ error: "Mesajlar alınamadı" });
   }
 };
-
 
 module.exports = {
   checkMyJobApplication,
