@@ -11,7 +11,7 @@ const { format } = require('util');
 const bucket = require('../firebase/firebaseService.cjs');
 const Room = require("../models/roomModel.cjs");
 const Message = require("../models/messageModel.cjs");
-const {socketConnections } = require("../socket/socketManager.cjs");
+const { socketConnections } = require("../socket/socketManager.cjs");
 
 const allJobPosts = async (req, res, next) => {
   try {
@@ -442,7 +442,7 @@ const sendMessage = async (req, res) => {
 
     const receiverSocket = socketConnections[receiver_id];
     if (receiverSocket) {
-      receiverSocket.to(roomName).emit("receiveMessage", {
+      receiverSocket.emit("receiveMessage", {
         _id: newMessage._id,
         room: room._id,
         sender_id,
@@ -452,6 +452,7 @@ const sendMessage = async (req, res) => {
         isRead: newMessage.isRead,
       });
     }
+
 
     res.status(200).json({ message: "Mesaj gönderildi" });
   } catch (error) {
