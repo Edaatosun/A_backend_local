@@ -239,12 +239,16 @@ const checkMyInternApplication = async (req, res, next) => {
       applicant: userId,
       intern: internId,
     });
-    if (application) {
-
+     if (application) {
       return res.status(200).json({
         message: "Başvuru yapılmış.",
         resume: application.resume,
       });
+    }else{
+      return res.status(200).json({
+        message: "Başvuru yapılmamış.",
+      });
+
     }
   } catch (error) {
     console.log("error at check my intern application:", error);
@@ -325,6 +329,12 @@ const checkMyEventApplication = async (req, res, next) => {
         message: "Başvuru yapılmış.",
         application: true
       });
+    }
+    else{
+      return res.status(200).json({
+        message: "Başvuru yapılmamış.",
+      });
+
     }
   } catch (error) {
     console.log("error at check my event application:", error);
