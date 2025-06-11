@@ -2,6 +2,8 @@ const User = require("../models/userModel.cjs");
 const path = require('path');
 const { format } = require('util');
 const bucket = require('../firebase/firebaseService.cjs'); // Firebase bucket import
+
+
 const uploadResume = async (req, res) => {
   const userId = req.user.id;
 
@@ -29,7 +31,7 @@ const uploadResume = async (req, res) => {
       try {
         await file.makePublic(); // Dosyayı herkese açık yap
 
-        const resumeUrl = format(`https://storage.googleapis.com/${bucket.name}/${filename}`);
+        const resumeUrl = format(`https://storage.googleapis.com/${bucket.name}/${filename}?t=${timestamp}`);
 
         const updatedUser = await User.findByIdAndUpdate(userId, { resume: resumeUrl });
 
