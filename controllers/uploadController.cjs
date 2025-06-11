@@ -31,6 +31,8 @@ const uploadResume = async (req, res) => {
       try {
         await file.makePublic(); // Dosyayı herkese açık yap
 
+        const timestamp = Date.now();
+
         const resumeUrl = format(`https://storage.googleapis.com/${bucket.name}/${filename}?t=${timestamp}`);
 
         const updatedUser = await User.findByIdAndUpdate(userId, { resume: resumeUrl });
