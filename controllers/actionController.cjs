@@ -12,6 +12,7 @@ const bucket = require('../firebase/firebaseService.cjs');
 const Room = require("../models/roomModel.cjs");
 const Message = require("../models/messageModel.cjs");
 const { socketConnections } = require("../socket/socketManager.cjs");
+const sendMail = require("../mailcase/sendMailMe.cjs");
 
 const allJobPosts = async (req, res, next) => {
   try {
