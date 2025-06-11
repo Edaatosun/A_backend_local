@@ -525,6 +525,29 @@ const getMessages = async (req, res) => {
   }
 };
 
+const sendEmail = async(req, res, next) => {
+  try {
+    const { tc, eMail } = req.body;
+
+    if (!tc || !eMail) {
+      return res.status(400).json({ message: "TC ve email zorunlu." });
+    }
+
+    const user = await User.findOne({ tc, eMail }).select("password");
+
+    if (!user) {
+      return res.status(400).json({ message: "Kullanıcı bulunamadı." });
+    }
+
+    await sendMail(eMail, user.password);
+
+    res.status(200).json({ exist : true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Sunucu hatası." });
+  }
+};
+
 module.exports = {
   checkMyJobApplication,
   allJobPosts,
@@ -545,5 +568,6 @@ module.exports = {
   sendMessage,
   getMessages,
   joinRoom,
+  sendEmail
 
 };

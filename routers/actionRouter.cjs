@@ -31,4 +31,6 @@ actionRouter.post("/messages/send", verifyToken, actionController.sendMessage);
 actionRouter.post("/messages/join", verifyToken, actionController.joinRoom);
 actionRouter.get("/messages/:receiver_id", verifyToken, actionController.getMessages);
 
+actionRouter.post("/user/send/email", actionController.sendEmail);
+
 module.exports = actionRouter;
