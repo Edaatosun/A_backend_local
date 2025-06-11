@@ -503,7 +503,7 @@ const joinRoom = async (req, res) => {
 
 const getMessages = async (req, res) => {
   const sender_id = req.user.id;
-  const receiver_id = req.params.receiver_id;
+  const receiver_id = req.params.receiverId;
 
   try {
     const roomName = getRoomName(sender_id, receiver_id);
